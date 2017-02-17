@@ -1,0 +1,149 @@
+WorldNames:
+  - world
+  - world2
+world:
+ RedSpawn:
+   x: 196
+   y: 95
+   z: 378
+   pitch: 90
+   yaw: 90
+ BlueSpawn:
+   x: 164
+   y: 89
+   z: 385
+   pitch: 90
+   yaw: 90
+ ObserverSpawn:
+   x: 161
+   y: 69
+   z: 256
+   pitch: 90
+   yaw: 90
+world2:
+ RedSpawn:
+   x: 196
+   y: 95
+   z: 378
+   pitch: 90
+   yaw: 90
+ BlueSpawn:
+   x: 164
+   y: 89
+   z: 385
+   pitch: 90
+   yaw: 90
+ ObserverSpawn:
+   x: 161
+   y: 69
+   z: 256
+   pitch: 90
+   yaw: 90
+DataBaseHost: localhost
+DataBaseName: wars
+DataBaseUser: root
+DataBasePassword:
+CoinsPerKill: 1
+CoinsPerWool: 1
+CoinsPerWin: 1
+ExpPerKill: 1
+ExpPerWool: 1
+ExpPerWin: 1
+DefaultKit: 0
+MatchTime: 1
+WoolRadius: 5
+Ranks:
+  '0': '%team%[1] &7'
+  '1': '%team%[2] &7'
+  '2': '%team%[3] &7'
+  '3': '%team%[4] &7'
+  '4': '%team%[5] &7'
+  '5': '%team%[6] &7'
+  '6': '%team%[7] &7'
+  '7': '%team%[7] &7'
+  '8': '%team%[7] &7'
+  '9': '%team%[7] &7'
+  '40': '%team%[7] &7'
+  '100': '%team%[7] &7'
+Kit:
+  Size: 27
+  '0':
+    Name: Default
+    Cost: 0
+    Permission: kit.default
+    KitSize: 2
+    Helmet:
+      Item: LEATHER_HELMET
+    ChestPlate:
+      Item: LEATHER_CHESTPLATE
+    Leggings:
+      Item: LEATHER_LEGGINGS
+    Boots:
+      Item: LEATHER_BOOTS
+      Enchantment: KNOCKBACK
+      Enchantment-Level: 1
+    Item0:
+      Item: WOOD_SWORD 
+      Amount: 1
+      Lore: ''
+      DataValue: 0
+    Item1:
+      Item: ARROW
+      Amount: 10
+      Lore: ''
+      DataValue: 0
+    'On':
+      Amount: 10
+      Item: STAINED_GLASS_PANE
+      Lore: 'Default class'
+      DataValue: 2
+    'Off':
+      Amount: 10
+      Item: STAINED_GLASS_PANE
+      Lore: 'Default class'
+      DataValue: 5
+  '1':
+    Name: Tank
+    Cost: 1
+    Permission: kit.tank
+    KitSize: 2
+    Helmet:
+      Item: LEATHER_HELMET
+      Amount: 1
+      Lore: ''
+    ChestPlate:
+      Item: LEATHER_CHESTPLATE
+      Amount: 1
+      Lore: ''
+    Leggings:
+      Item: LEATHER_LEGGINGS
+      Amount: 1
+      Lore: ''
+    Boots:
+      Item: LEATHER_BOOTS
+      Amount: 1
+      Lore: ''
+    Item0:
+      Item: WOOD_SWORD 
+      Amount: 1
+      Lore: ''
+      DataValue: 0
+    Item1:
+      Item: ARROW
+      Amount: 25
+      Lore: ''
+      DataValue: 0
+    'On':
+      Amount: 10
+      Item: STAINED_GLASS_PANE
+      Lore: 'best class'
+      DataValue: 2
+    'Off':
+      Amount: 10
+      Item: STAINED_GLASS_PANE
+      Lore: 'best class'
+      DataValue: 5
+      
+commands:
+   playerKilled: '/broadcast %killer% has killed %player%'
+   woolDestroyed: '/broadcast Wool was destoryed by %destroyer%'

@@ -1,0 +1,15 @@
+name: Warzone
+description: Warzone
+main: com.cubedcraft.warzone.Main
+author: Partydragen
+version: 1.0
+commands:
+  team:
+    description: Displays team menu
+    usage: Type /team
+  kit:
+    description: Displays kit
+    usage: Type /kit
+  warzone:
+    description: Main command for the warzone plugin
+    usage: Type /warzone {coins/exp} {add/remove/set} {player} {amount}
