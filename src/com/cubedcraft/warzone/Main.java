@@ -463,9 +463,6 @@ implements Listener {
         Score Wins = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bWins:&f " + wz.getWins()));
         Score Wool = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bScore:&f " + wz.getExp()));
         Score Score = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bWool Broken:&f " + wz.getWool()));
-        Score blank2 = objective.getScore("  ");
-        Score ip = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&6mc.cubedcraft.com"));
-        
         Score RedTeamScored = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&cRed: " + RedTeamScore + "%"));
         Score BlueTeamScored = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&9Blue: " + BlueTeamScore + "%"));
         RedTeamScored.setScore(12);
@@ -478,8 +475,6 @@ implements Listener {
         Wins.setScore(5);
         Score.setScore(4);
         Wool.setScore(3);
-        blank2.setScore(2);
-        ip.setScore(1);
         p.setDisplayName(String.valueOf(Config.getPrefix(p)) + " " + ChatColor.WHITE + p.getName());
         p.setScoreboard(board);
     }
