@@ -37,6 +37,8 @@ import com.cubedcraft.warzone.Events.InventoryEvents;
 import com.cubedcraft.warzone.Events.PlayerJoin;
 import com.cubedcraft.warzone.Events.PlayerKill;
 
+import io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI;
+
 public class Main
 extends JavaPlugin
 implements Listener {
@@ -57,6 +59,7 @@ implements Listener {
     static Scoreboard board;
     static int time;
     String character_heart;
+    private static TitleManagerAPI titleManagerAPI;
 
     static {
         activeworldint = -1;
@@ -82,6 +85,7 @@ implements Listener {
 
     public void onEnable() {
         plugin = this;
+        titleManagerAPI = (TitleManagerAPI) getServer().getPluginManager().getPlugin("TitleManager");
         cd = new StartCountdown();
         ActiveWorld = "WarZoneWorld";
         if (Config.getWorldName() == null) {
@@ -505,6 +509,7 @@ implements Listener {
                     Bukkit.broadcastMessage(ChatColor.RED + "The red team won!");
                     Bukkit.broadcastMessage(ChatColor.RED + "The red team won!");
                     Bukkit.broadcastMessage(ChatColor.RED + "The red team won!");
+                    titleManagerAPI.sendTitle(ChatColor.RED + "The red team won!");
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerWin")
                     		.replace("%player%", p.getName()));
                 }
@@ -534,6 +539,7 @@ implements Listener {
                     Bukkit.broadcastMessage(ChatColor.BLUE + "The blue team won!");
                     Bukkit.broadcastMessage(ChatColor.BLUE + "The blue team won!");
                     Bukkit.broadcastMessage(ChatColor.BLUE + "The blue team won!");
+                    titleManagerAPI.sendTitle(ChatColor.BLUE + "The blue team won!");
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerWin")
                     		.replace("%player%", p.getName()));
                 }

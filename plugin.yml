@@ -3,6 +3,7 @@ description: Warzone
 main: com.cubedcraft.warzone.Main
 author: Partydragen
 version: 1.0
+depend: [TitleManager]
 commands:
   team:
     description: Displays team menu
