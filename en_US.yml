@@ -1,0 +1,4 @@
+prefix: '&6&l[&c&lWarzone&6&l] '
+
+notEnoughPlayersPerTeam: '&cNot enough players in each team'
+notEnoughPlayers: '&cGame ended due to not enough players'

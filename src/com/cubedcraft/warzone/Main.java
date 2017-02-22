@@ -37,6 +37,9 @@ import com.cubedcraft.warzone.Events.InventoryEvents;
 import com.cubedcraft.warzone.Events.PlayerJoin;
 import com.cubedcraft.warzone.Events.PlayerKill;
 
+import es.minetsii.languages.Languages;
+import es.minetsii.languages.objects.Language;
+import es.minetsii.languages.utils.SendManager;
 import io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI;
 
 public class Main
@@ -85,6 +88,7 @@ implements Listener {
 
     public void onEnable() {
         plugin = this;
+        LanguageUtils.loadPlugin(this);
         titleManagerAPI = (TitleManagerAPI) getServer().getPluginManager().getPlugin("TitleManager");
         cd = new StartCountdown();
         ActiveWorld = "WarZoneWorld";
@@ -110,6 +114,11 @@ implements Listener {
         }
         this.runTimer();
         this.character_heart = StringEscapeUtils.unescapeJava((String)"\u2764");
+    }
+    
+    @EventHandler
+    public void langs(LangsLoadEvent e) {
+        e.addPlugin(plugin);
     }
 
     private void loadWorlds() {
@@ -174,10 +183,12 @@ implements Listener {
                     if (!Main.GameStarted.booleanValue()) {
                         if (Main.time % 101 != 0) return;
                         Main.time = 0;
-                        Bukkit.broadcastMessage((String)ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cNot enough players in each team"));
+                        Bukkit.broadcastMessage((String)ChatColor.translateAlternateColorCodes
+                        		('&', SendManager.getMessage("notEnoughPlayersPerTeam", Languages.getDefaultLanguage(), true, plugin)));
                         return;
                     }
-                    Bukkit.broadcastMessage((String)ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to not enough players"));
+                    Bukkit.broadcastMessage((String)ChatColor.translateAlternateColorCodes('&', 
+                    		SendManager.getMessage("notEnoughPlayers", Languages.getDefaultLanguage(), true, plguin));
                     Main.access$0(true);
                     Main.endGameCount();
                     Main.time = 0;
