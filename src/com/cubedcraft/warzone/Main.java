@@ -183,12 +183,12 @@ implements Listener {
                     if (!Main.GameStarted.booleanValue()) {
                         if (Main.time % 101 != 0) return;
                         Main.time = 0;
-                        Bukkit.broadcastMessage((String)ChatColor.translateAlternateColorCodes
+                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes
                         		('&', SendManager.getMessage("notEnoughPlayersPerTeam", Languages.getDefaultLanguage(), true, plugin)));
                         return;
                     }
-                    Bukkit.broadcastMessage((String)ChatColor.translateAlternateColorCodes('&', 
-                    		SendManager.getMessage("notEnoughPlayers", Languages.getDefaultLanguage(), true, plguin));
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', 
+                    		SendManager.getMessage("notEnoughPlayers", Languages.getDefaultLanguage(), true, plugin));
                     Main.access$0(true);
                     Main.endGameCount();
                     Main.time = 0;
@@ -322,9 +322,9 @@ implements Listener {
         }
         GameStarted = false;
         if (!GameEndedDuetoWoolDestroyed) {
-            Bukkit.broadcastMessage((String)(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
-            Bukkit.broadcastMessage((String)(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
-            Bukkit.broadcastMessage((String)(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
+            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
+            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
+            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
         }
         cd.start(10, "restarting");
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -520,7 +520,9 @@ implements Listener {
                     Bukkit.broadcastMessage(ChatColor.RED + "The red team won!");
                     Bukkit.broadcastMessage(ChatColor.RED + "The red team won!");
                     Bukkit.broadcastMessage(ChatColor.RED + "The red team won!");
-                    titleManagerAPI.sendTitle(ChatColor.RED + "The red team won!");
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        titleManagerAPI.sendTitle(player, ChatColor.RED + "Red team won!");
+                    });
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerWin")
                     		.replace("%player%", p.getName()));
                 }
@@ -550,7 +552,9 @@ implements Listener {
                     Bukkit.broadcastMessage(ChatColor.BLUE + "The blue team won!");
                     Bukkit.broadcastMessage(ChatColor.BLUE + "The blue team won!");
                     Bukkit.broadcastMessage(ChatColor.BLUE + "The blue team won!");
-                    titleManagerAPI.sendTitle(ChatColor.BLUE + "The blue team won!");
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        titleManagerAPI.sendTitle(player, ChatColor.BLUE + "Blue team won!");
+                    });
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerWin")
                     		.replace("%player%", p.getName()));
                 }
