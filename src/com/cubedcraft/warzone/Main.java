@@ -116,6 +116,9 @@ implements Listener {
         }
         this.runTimer();
         this.character_heart = StringEscapeUtils.unescapeJava((String)"\u2764");
+        if(Bukkit.getPluginManager().getPlugin("LeaderHeads") != null) {
+        	new LeaderHeadsIntegration();
+        }
     }
     
     @EventHandler 

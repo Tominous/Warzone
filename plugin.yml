@@ -4,6 +4,7 @@ main: com.cubedcraft.warzone.Main
 author: Partydragen
 version: 1.0
 depend: [TitleManager]
+softdepend: [LeaderHeads]
 commands:
   team:
     description: Displays team menu
