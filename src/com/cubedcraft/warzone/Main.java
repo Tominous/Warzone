@@ -16,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -38,10 +37,6 @@ import com.cubedcraft.warzone.Events.InventoryEvents;
 import com.cubedcraft.warzone.Events.PlayerJoin;
 import com.cubedcraft.warzone.Events.PlayerKill;
 
-import es.minetsii.languages.events.custom.LangsLoadEvent;
-import es.minetsii.languages.utils.LanguageUtils;
-import es.minetsii.languages.utils.SendManager;
-import es.minetsii.languages.Languages;
 import io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI;
 
 public class Main
@@ -71,7 +66,7 @@ implements Listener {
         gamestartingwithtimer = false;
         GameEndedDuetoWoolDestroyed = false;
         GameStarted = false;
-        ActiveWorld = "WarZoneWorld";
+        ActiveWorld = "WarzoneWorld";
         WarZonePlayers = new HashMap<>();
         time = 0;
     }
@@ -85,21 +80,20 @@ implements Listener {
     }
 
     public static void setCurrentWorldName(String currentWorldName) {
-        Main.currentWorldName = currentWorldName;
+        currentWorldName = worlds.get(activeworldint);
     }
 
     public void onEnable() {
         plugin = this;
-        LanguageUtils.loadPlugin(this);
         titleManagerAPI = (TitleManagerAPI) getServer().getPluginManager().getPlugin("TitleManager");
         cd = new StartCountdown();
-        ActiveWorld = "WarZoneWorld";
+        ActiveWorld = "WarzoneWorld";
         if (Config.getWorldName() == null) {
             this.saveDefaultConfig();
         }
         worlds = Config.getWorlds();
-        Bukkit.getServer().unloadWorld("WarZoneWorld", false);
-        Bukkit.getServer().unloadWorld("WarZoneWorld2", false);
+        Bukkit.getServer().unloadWorld("WarzoneWorld", false);
+        Bukkit.getServer().unloadWorld("WarzoneWorld2", false);
         Mysql.CheckConnection();
         this.getServer().getPluginManager().registerEvents((Listener)new PlayerKill(), (Plugin)this);
         this.getServer().getPluginManager().registerEvents((Listener)new PlayerJoin(), (Plugin)this);
@@ -108,10 +102,13 @@ implements Listener {
         this.getCommand("team").setExecutor((CommandExecutor)new Commands());
         this.getCommand("kit").setExecutor((CommandExecutor)new Commands());
         this.getCommand("warzone").setExecutor((CommandExecutor)new Commands());
+        this.getCommand("wardebug").setExecutor((CommandExecutor)new AdminCommands());
+        this.getCommand("endgame").setExecutor((CommandExecutor)new AdminCommands());
+        this.getCommand("rotate").setExecutor((CommandExecutor)new AdminCommands());
         this.loadWorlds();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            p.teleport(Bukkit.getWorld((String)ActiveWorld).getSpawnLocation());
-            if (WarZonePlayers.containsKey(p.getUniqueId())) continue;
+            p.teleport(Bukkit.getWorld(ActiveWorld).getSpawnLocation());
+        if (WarZonePlayers.containsKey(p.getUniqueId())) continue;
             Main.addWarZonePlayer(p.getUniqueId(), Mysql.getWarZonePlayer(p.getUniqueId()));
         }
         this.runTimer();
@@ -119,11 +116,6 @@ implements Listener {
         if(Bukkit.getPluginManager().getPlugin("LeaderHeads") != null) {
         	new LeaderHeadsIntegration();
         }
-    }
-    
-    @EventHandler 
-    public void langs(LangsLoadEvent e) {
-        e.addPlugin(plugin);
     }
 
     private void loadWorlds() {
@@ -188,12 +180,10 @@ implements Listener {
                     if (!Main.GameStarted.booleanValue()) {
                         if (Main.time % 101 != 0) return;
                         Main.time = 0;
-                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', 
-                        		SendManager.getMessage("notEnoughPlayersPerTeam", Languages.getDefaultLanguage(), true, plugin)));
+                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cNot enough players in each team"));
                         return;
                     }
-                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', 
-                    		SendManager.getMessage("notEnoughPlayers", Languages.getDefaultLanguage(), true, plugin)));
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to not enough players"));
                     Main.access$0(true);
                     Main.endGameCount();
                     Main.time = 0;
@@ -238,7 +228,7 @@ implements Listener {
 
                     public void run() {
                         Main.time = 0;
-                        Main.log.info("Game started2? " + Main.GameStarted);
+                        Main.log.info("Debug 1: Game started? " + Main.GameStarted);
                         if (Main.GameStarted.booleanValue()) {
                             return;
                         }
@@ -268,7 +258,7 @@ implements Listener {
     public static void startPlayerGame(Player p) {
         WarZonePlayer wz = Main.getWarZonePlayer(p.getUniqueId());
         if (wz.isBlue() || wz.isRed()) {
-            log.info(p.getName());
+            log.info("Debug 2:" + p.getName());
             p.setGameMode(GameMode.SURVIVAL);
             p.getInventory().clear();
             p.setHealth(20.0);
@@ -337,7 +327,7 @@ implements Listener {
             wz.setObserver();
             p.getInventory().clear();
             p.setGameMode(GameMode.SURVIVAL);
-            p.setPlayerListName(ChatColor.AQUA + p.getName());
+            p.setPlayerListName(String.valueOf(Config.getPrefix(p)) + " " + ChatColor.AQUA + p.getName());
             Mysql.UpdateWarZonePlayer(p.getUniqueId());
             for (Player toshow : Bukkit.getOnlinePlayers()) {
                 p.showPlayer(toshow);
@@ -359,12 +349,12 @@ implements Listener {
         File backup;
         time = 0;
         String tounload = ActiveWorld;
-        if (ActiveWorld == "WarZoneWorld") {
+        if (ActiveWorld == "WarzoneWorld") {
             ActiveWorld = "WarzoneWorld2";
-            backup = new File(Bukkit.getWorldContainer() + "/WarZoneWorld");
-            toDelete = new File(Bukkit.getWorldContainer() + "/WarZoneWorld/uid.dat");
+            backup = new File(Bukkit.getWorldContainer() + "/WarzoneWorld");
+            toDelete = new File(Bukkit.getWorldContainer() + "/WarzoneWorld/uid.dat");
         } else {
-            ActiveWorld = "WarZoneWorld";
+            ActiveWorld = "WarzoneWorld";
             backup = new File(Bukkit.getWorldContainer() + "/WarzoneWorld2");
             toDelete = new File(Bukkit.getWorldContainer() + "/WarzoneWorld2/uid.dat");
         }
@@ -374,16 +364,17 @@ implements Listener {
                 wz.setObserver();
             }
             p.teleport(Config.getObserverSpawn());
+            p.setHealth(20.0);
             Main.giveStartItems(p);
         }
         Bukkit.getServer().unloadWorld(tounload, false);
         activeworldint = activeworldint < worlds.size() - 1 && activeworldint != -1 ? ++activeworldint : 0;
-        currentWorldName = worlds.get(activeworldint);
+        currentWorldName = Main.NextWorld = worlds.get(activeworldint);
         try {
             FileUtils.deleteDirectory((File)backup);
             FileUtils.copyDirectory((File)new File(Bukkit.getWorldContainer() + "/" + worlds.get(activeworldint)), (File)backup);
             FileUtils.forceDelete((File)toDelete);
-            log.info("deleted:" + tounload + " activeworld:" + ActiveWorld);
+            log.info("Debug 3: deleted:" + tounload + " activeworld:" + ActiveWorld);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -455,11 +446,11 @@ implements Listener {
         WarZonePlayer wz = Main.getWarZonePlayer(p.getUniqueId());
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard board = manager.getNewScoreboard();
-        Objective objective = board.registerNewObjective(ChatColor.GOLD + "Objectives", p.getName());
+        Objective objective = board.registerNewObjective(ChatColor.YELLOW + "Warzone", p.getName());
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         Objective objective2 = board.registerNewObjective("HEALTH", "health");
         objective2.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        objective2.setDisplayName(ChatColor.DARK_RED + StringEscapeUtils.unescapeJava((String)"\u2764"));
+        objective2.setDisplayName(ChatColor.DARK_RED + StringEscapeUtils.unescapeJava("\u2764"));
         Team Blue = board.registerNewTeam("BlueTeam");
         Team red = board.registerNewTeam("RedTeam");
         Blue.setAllowFriendlyFire(false);
@@ -475,26 +466,28 @@ implements Listener {
             red.addEntry(pl.getName());
             Blue.removeEntry(pl.getName());
         }
-        Score Coins = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bCoins:&f " + wz.getCoins()));
-        Score Stats = objective.getScore(ChatColor.translateAlternateColorCodes('&', "         &6Stats     "));
+        Score Objectives = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&eObjectives"));
+        Score Coins = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a> &fCoins:&a " + wz.getCoins()));
+        Score Stats = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&eStats"));
         Score blank = objective.getScore("  ");
-        Score Kills = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bKills:&f " + wz.getKills()));
-        Score Deaths = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bDeaths:&f " + wz.getDeaths()));
-        Score Wins = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bWins:&f " + wz.getWins()));
-        Score Wool = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bScore:&f " + wz.getExp()));
-        Score Score = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&bWool Broken:&f " + wz.getWool()));
+        Score Kills = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a> &fKills:&a " + wz.getKills()));
+        Score Deaths = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a> &fDeaths:&a " + wz.getDeaths()));
+        Score Wins = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a> &fWins:&a " + wz.getWins()));
+        Score Wool = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a> &fScore:&a " + wz.getExp()));
+        Score Score = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&a> &fWool:&a " + wz.getWool()));
         Score RedTeamScored = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&cRed: " + RedTeamScore + "%"));
         Score BlueTeamScored = objective.getScore(ChatColor.translateAlternateColorCodes('&', "&9Blue: " + BlueTeamScore + "%"));
-        RedTeamScored.setScore(12);
-        BlueTeamScored.setScore(11);
-        blank.setScore(10);
-        Stats.setScore(9);
-        Coins.setScore(8);
-        Kills.setScore(7);
-        Deaths.setScore(6);
-        Wins.setScore(5);
-        Score.setScore(4);
-        Wool.setScore(3);
+        Objectives.setScore(11);
+        RedTeamScored.setScore(10);
+        BlueTeamScored.setScore(9);
+        blank.setScore(8);
+        Stats.setScore(7);
+        Coins.setScore(6);
+        Kills.setScore(5);
+        Deaths.setScore(4);
+        Wins.setScore(3);
+        Score.setScore(2);
+        Wool.setScore(1);
         p.setDisplayName(String.valueOf(Config.getPrefix(p)) + " " + ChatColor.WHITE + p.getName());
         p.setScoreboard(board);
     }
@@ -605,5 +598,14 @@ implements Listener {
         gamestartingwithtimer = bl;
     }
 
-}
+	public static void Debug(Player p) {
+        log.info("Worlds:" + worlds.toString());
+        log.info("Now" + worlds.get(activeworldint));
+        log.info("Now" + currentWorldName);
+        log.info("NextWorld" + Main.NextWorld);
+	}
 
+	public static void Rotate() {
+		currentWorldName = worlds.get(activeworldint);
+	}
+}
