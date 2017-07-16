@@ -54,7 +54,6 @@ implements Listener {
     public static Boolean GameStarted;
     public static String ActiveWorld;
     public static String NextWorld;
-    public static String currentMap;
     static HashMap<UUID, WarZonePlayer> WarZonePlayers;
     private static StartCountdown cd;
     static Scoreboard board;
@@ -99,9 +98,8 @@ implements Listener {
         this.getCommand("team").setExecutor((CommandExecutor)new Commands());
         this.getCommand("kit").setExecutor((CommandExecutor)new Commands());
         this.getCommand("warzone").setExecutor((CommandExecutor)new Commands());
+        this.getCommand("next").setExecutor((CommandExecutor)new AdminCommands());
         this.getCommand("wardebug").setExecutor((CommandExecutor)new AdminCommands());
-        this.getCommand("endgame").setExecutor((CommandExecutor)new AdminCommands());
-        this.getCommand("rotate").setExecutor((CommandExecutor)new AdminCommands());
         this.loadWorlds();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(Bukkit.getWorld(ActiveWorld).getSpawnLocation());
@@ -117,8 +115,7 @@ implements Listener {
 
     private void loadWorlds() {
         activeworldint = activeworldint < worlds.size() - 1 && activeworldint != -1 ? ++activeworldint : 0;
-        Main.NextWorld = worlds.get(activeworldint);
-        Main.Rotate();
+        currentWorldName = Main.NextWorld = worlds.get(activeworldint);
         File backup = new File(Bukkit.getWorldContainer() + "/WarzoneWorld");
         File backup2 = new File(Bukkit.getWorldContainer() + "/WarzoneWorld2");
         try {
@@ -159,6 +156,11 @@ implements Listener {
     public void runTimer() {
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable(){
+
+            /*
+             * Enabled force condition propagation
+             * Lifted jumps to return sites
+             */
             @Override
             public void run() {
                 if (++Main.time >= Config.getGameLength() * 60) {
@@ -310,9 +312,8 @@ implements Listener {
         }
         GameStarted = false;
         if (!GameEndedDuetoWoolDestroyed) {
-            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
-            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
-            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached!")));
+            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to time limit being reached")));
+            Bukkit.broadcastMessage((ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cOr a staff member ended the game!")));
         }
         cd.start(10, "restarting");
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -336,7 +337,7 @@ implements Listener {
             }
         }.runTaskLater(plugin, 200);
     }
-
+    
     public static void endGame() {
         File toDelete;
         File backup;
@@ -361,9 +362,8 @@ implements Listener {
             Main.giveStartItems(p);
         }
         Bukkit.getServer().unloadWorld(tounload, false);
-        activeworldint = activeworldint < worlds.size() - 1 && activeworldint != -1 ? ++activeworldint : 1;
-        Main.NextWorld = worlds.get(activeworldint);
-        Main.Rotate();
+        activeworldint = activeworldint < worlds.size() - 1 && activeworldint != -1 ? ++activeworldint : 0;
+        currentWorldName = Main.NextWorld = worlds.get(activeworldint);
         try {
             FileUtils.deleteDirectory((File)backup);
             FileUtils.copyDirectory((File)new File(Bukkit.getWorldContainer() + "/" + worlds.get(activeworldint)), (File)backup);
@@ -593,20 +593,11 @@ implements Listener {
     }
 
 	public static void Debug(Player p) {
-        log.info("Worlds: " + worlds.toString());
-        log.info("Now " + worlds.get(activeworldint));
-        log.info("Now " + currentWorldName);
-        log.info("NextWorld: " + Main.NextWorld);
-        log.info("Current: " + Main.NextWorld);
+        log.info("DEBUG: " + worlds.toString());
+        log.info("DEBUG: " + worlds.get(activeworldint));
+        log.info("DEBUG: " + currentWorldName);
+        log.info("DEBUG: " + Main.NextWorld);
 	}
 
-	public static void Rotate() {
-		currentMap = worlds.get(activeworldint);
-        if (currentMap == "war1") {
-        	currentWorldName = "war1";
-        } else {
-        	currentWorldName = "war2";
-        }
-	}
 }
 

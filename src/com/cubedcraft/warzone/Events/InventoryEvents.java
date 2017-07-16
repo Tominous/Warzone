@@ -42,25 +42,29 @@ implements Listener {
                     return;
                 }
                 if (clicked.getType().equals(Material.BOOK)) {
-                    if (this.tea.booleanValue()) {
-                        this.tea = false;
-                        wz.setBlue();
-                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
-                        player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
-                        if (Main.GameStarted.booleanValue()) {
-                            Main.startPlayerGame(player);
-                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
-                        }
-                    } else {
-                        this.tea = true;
-                        wz.setRed();
-                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
-                        player.sendMessage(ChatColor.RED + "You have been added to the red team");
-                        if (Main.GameStarted.booleanValue()) {
-                            Main.startPlayerGame(player);
-                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &4RED&f team"));
-                        }
-                    }
+                	if (wz.isObserver()) {
+	                    if (this.tea.booleanValue()) {
+	                        this.tea = false;
+	                        wz.setBlue();
+	                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
+	                        player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
+	                        if (Main.GameStarted.booleanValue()) {
+	                            Main.startPlayerGame(player);
+	                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
+	                        }
+	                    } else {
+	                        this.tea = true;
+	                        wz.setRed();
+	                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
+	                        player.sendMessage(ChatColor.RED + "You have been added to the red team");
+	                        if (Main.GameStarted.booleanValue()) {
+	                            Main.startPlayerGame(player);
+	                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &4RED&f team"));
+	                        }
+	                    }
+                	} else {
+                		player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cYou have already selected a team"));
+                	}
                     ev.setCancelled(true);
                     player.closeInventory();
                 }
