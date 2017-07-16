@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -44,18 +45,20 @@ implements Listener {
                     if (this.tea.booleanValue()) {
                         this.tea = false;
                         wz.setBlue();
-                        player.setPlayerListName(ChatColor.BLUE + player.getName());
+                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
                         player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
                         if (Main.GameStarted.booleanValue()) {
                             Main.startPlayerGame(player);
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
                         }
                     } else {
                         this.tea = true;
                         wz.setRed();
-                        player.setPlayerListName(ChatColor.RED + player.getName());
+                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
                         player.sendMessage(ChatColor.RED + "You have been added to the red team");
                         if (Main.GameStarted.booleanValue()) {
                             Main.startPlayerGame(player);
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &4RED&f team"));
                         }
                     }
                     ev.setCancelled(true);
@@ -66,10 +69,11 @@ implements Listener {
                         ev.setCancelled(true);
                         player.closeInventory();
                         wz.setBlue();
-                        player.setPlayerListName(ChatColor.BLUE + player.getName());
+                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
                         player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
                         if (Main.GameStarted.booleanValue()) {
                             Main.startPlayerGame(player);
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
                         }
                     } else {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cOnly donators can choose their team"));
@@ -81,10 +85,11 @@ implements Listener {
                         ev.setCancelled(true);
                         player.closeInventory();
                         wz.setRed();
-                        player.setPlayerListName(ChatColor.RED + player.getName());
+                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
                         player.sendMessage(ChatColor.RED + "You have been added to the red team");
                         if (Main.GameStarted.booleanValue()) {
                             Main.startPlayerGame(player);
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &4RED&f team"));
                         }
                     } else {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cOnly donators can choose their team"));
@@ -149,7 +154,7 @@ implements Listener {
             }
             if (p.getInventory().getItemInHand().getType().equals(Material.TNT) && Main.GameStarted.booleanValue() && (wz.isBlue() || wz.isRed())) {
                 if (this.TntCooldowns.contains(ev.getPlayer().getUniqueId())) {
-                    ev.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cYou have to wait 30 sec before you can use tnt again!"));
+                    ev.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cYou have to wait 15 sec before you can use tnt again!"));
                     ev.setCancelled(true);
                     return;
                 }
@@ -165,7 +170,7 @@ implements Listener {
                     public void run() {
                         InventoryEvents.this.TntCooldowns.remove(ev.getPlayer().getUniqueId());
                     }
-                }.runTaskLater(Main.getPlugin(), 600);
+                }.runTaskLater(Main.getPlugin(), 300);
             }
         }
         if (!wz.isRed() && !wz.isBlue()) {

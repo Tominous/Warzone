@@ -32,12 +32,13 @@ implements Listener {
         Main.giveStartItems(p);
         Main.CreateScoreBoard(p);
         p.setGameMode(GameMode.SURVIVAL);
-        p.setPlayerListName(ChatColor.AQUA + p.getName());
+        p.setPlayerListName(String.valueOf(Config.getPrefix(p)) + " " + ChatColor.AQUA + p.getName());
         Main.Fixinvis();
         new BukkitRunnable(){
 
             public void run() {
                 p.teleport(Config.getObserverSpawn());
+                Main.TeamSelect(p);
             }
         }.runTaskLater(Main.getPlugin(), 5);
     }

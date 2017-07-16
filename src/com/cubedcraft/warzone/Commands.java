@@ -1,5 +1,6 @@
 package com.cubedcraft.warzone;
 
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -8,8 +9,8 @@ import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class Commands
-implements CommandExecutor {
+public class Commands implements CommandExecutor {
+	static Logger log = Logger.getLogger("Minecraft.QueuSigns");
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             WarZonePlayer wztoSet;
@@ -78,7 +79,7 @@ implements CommandExecutor {
                         }
                     }
                 } else {
-                    sender.sendMessage((Object)ChatColor.RED + "Invalid arugments!");
+                    sender.sendMessage(ChatColor.RED + "Invalid arugments!");
                     return false;
                 }
             }

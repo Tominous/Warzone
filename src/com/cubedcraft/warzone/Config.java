@@ -88,7 +88,9 @@ public class Config {
         Double z = config.getDouble(String.valueOf(worldname) + ".ObserverSpawn.z");
         int pitch = config.getInt(String.valueOf(worldname) + ".ObserverSpawn.pitch");
         int yaw = config.getInt(String.valueOf(worldname) + ".ObserverSpawn.yaw");
-        log.info("Active world: " + Bukkit.getWorld((String)Main.ActiveWorld).getName() + " world name: " + worldname + " x: " + x + " y: " + y + " z: " + z);
+        log.info("Debug: Active-World: " + Bukkit.getWorld(Main.ActiveWorld).getName());
+        log.info("Debug: World-Name: " + worldname);
+        log.info("Debug: Cords: x: " + x + " y: " + y + " z: " + z);
         return new Location(Bukkit.getWorld((String)Main.ActiveWorld), x.doubleValue(), y.doubleValue(), z.doubleValue(), (float)yaw, (float)pitch);
     }
 
