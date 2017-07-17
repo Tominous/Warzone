@@ -1,10 +1,9 @@
-package com.cubedcraft.warzone.Events;
+package com.cubedcraft.warzone.events;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -24,11 +23,9 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
-
 import com.cubedcraft.warzone.Config;
 import com.cubedcraft.warzone.Main;
 import com.cubedcraft.warzone.WarZonePlayer;
-
 import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
 
@@ -189,7 +186,7 @@ implements Listener {
 	@EventHandler
     public void BlockPlace(BlockPlaceEvent ev) {
         WarZonePlayer wz = Main.getWarZonePlayer(ev.getPlayer().getUniqueId());
-        if (wz.isObserver() || !Main.GameStarted.booleanValue()) {
+        if (wz.isObserver() || !Main.GameStarted) {
             ev.setCancelled(true);
             return;
         }

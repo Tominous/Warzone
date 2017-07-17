@@ -1,4 +1,4 @@
-package com.cubedcraft.warzone.Events;
+package com.cubedcraft.warzone.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,6 +22,7 @@ public class PlayerKill implements Listener {
             event.setCancelled(true);
         }
     }
+    
     @EventHandler
     public void PlayerDeathEv(PlayerDeathEvent ev) {
         final Player p = ev.getEntity();

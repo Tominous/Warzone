@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -14,7 +16,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.WorldCreator;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -32,16 +33,17 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-import com.cubedcraft.warzone.Events.BlockEvents;
-import com.cubedcraft.warzone.Events.InventoryEvents;
-import com.cubedcraft.warzone.Events.PlayerJoin;
-import com.cubedcraft.warzone.Events.PlayerKill;
+import com.cubedcraft.warzone.events.BlockEvents;
+import com.cubedcraft.warzone.events.InventoryEvents;
+import com.cubedcraft.warzone.events.PlayerJoin;
+import com.cubedcraft.warzone.events.PlayerKill;
+import com.cubedcraft.warzone.teams.Team.ETeam;
+import com.google.common.collect.Maps;
 
 import io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI;
 
-public class Main
-extends JavaPlugin
-implements Listener {
+public class Main extends JavaPlugin implements Listener {
+	
     static Logger log = Logger.getLogger("Minecraft.QueuSigns");
     static int RedTeamScore = 100;
     static int BlueTeamScore = 100;
@@ -60,7 +62,8 @@ implements Listener {
     static int time;
     String character_heart;
     private static TitleManagerAPI titleManagerAPI;
-
+    public static Map<ETeam, com.cubedcraft.warzone.teams.Team> teams = Maps.newHashMap();
+    
     static {
         activeworldint = -1;
         gamestartingwithtimer = false;
@@ -70,7 +73,21 @@ implements Listener {
         WarZonePlayers = new HashMap<>();
         time = 0;
     }
-
+    
+    public static com.cubedcraft.warzone.teams.Team searchTeam() {
+    	com.cubedcraft.warzone.teams.Team team = null;
+    	for(Entry<ETeam, com.cubedcraft.warzone.teams.Team> entry : teams.entrySet()) {
+    		if(team == null) {
+    			team = entry.getValue();
+    			continue;
+    		}
+    		if(entry.getValue().size() < team.size()) {
+    			team = entry.getValue();
+    		}
+    	}
+    	return team;
+    }
+    
     public static HashMap<UUID, WarZonePlayer> getWarZonePlayers() {
         return WarZonePlayers;
     }
@@ -91,15 +108,15 @@ implements Listener {
         Bukkit.getServer().unloadWorld("WarzoneWorld", false);
         Bukkit.getServer().unloadWorld("WarzoneWorld2", false);
         Mysql.CheckConnection();
-        this.getServer().getPluginManager().registerEvents((Listener)new PlayerKill(), (Plugin)this);
-        this.getServer().getPluginManager().registerEvents((Listener)new PlayerJoin(), (Plugin)this);
-        this.getServer().getPluginManager().registerEvents((Listener)new InventoryEvents(), (Plugin)this);
-        this.getServer().getPluginManager().registerEvents((Listener)new BlockEvents(), (Plugin)this);
-        this.getCommand("team").setExecutor((CommandExecutor)new Commands());
-        this.getCommand("kit").setExecutor((CommandExecutor)new Commands());
-        this.getCommand("warzone").setExecutor((CommandExecutor)new Commands());
-        this.getCommand("next").setExecutor((CommandExecutor)new AdminCommands());
-        this.getCommand("wardebug").setExecutor((CommandExecutor)new AdminCommands());
+        this.getServer().getPluginManager().registerEvents(new PlayerKill(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
+        this.getServer().getPluginManager().registerEvents(new InventoryEvents(), this);
+        this.getServer().getPluginManager().registerEvents(new BlockEvents(), this);
+        this.getCommand("team").setExecutor(new Commands());
+        this.getCommand("kit").setExecutor(new Commands());
+        this.getCommand("warzone").setExecutor(new Commands());
+        this.getCommand("next").setExecutor(new AdminCommands());
+        this.getCommand("wardebug").setExecutor(new AdminCommands());
         this.loadWorlds();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(Bukkit.getWorld(ActiveWorld).getSpawnLocation());
@@ -110,6 +127,10 @@ implements Listener {
         this.character_heart = StringEscapeUtils.unescapeJava((String)"\u2764");
         if(Bukkit.getPluginManager().getPlugin("LeaderHeads") != null) {
         	new LeaderHeadsIntegration();
+        }
+        
+        for(ETeam team : ETeam.values()) {
+        	teams.put(team, new com.cubedcraft.warzone.teams.Team(team));
         }
     }
 
@@ -163,31 +184,33 @@ implements Listener {
              */
             @Override
             public void run() {
-                if (++Main.time >= Config.getGameLength() * 60) {
-                    if (Main.GameStarted.booleanValue()) {
-                        Main.endGameCount();
+                if (++time >= Config.getGameLength() * 60) {
+                    if (GameStarted) {
+                        endGameCount();
                         return;
                     }
-                    Main.time = 0;
+                    time = 0;
                     return;
                 }
-                if (!Main.isEnoughPlayers()) {
-                    if (!Main.GameStarted.booleanValue()) {
-                        if (Main.time % 101 != 0) return;
-                        Main.time = 0;
+                if (!isEnoughPlayers()) {
+                    if (!GameStarted.booleanValue()) {
+                        if (time % 101 != 0) return;
+                        time = 0;
                         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cNot enough players in each team"));
                         return;
                     }
                     Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&6&l[&c&lWarzone&6&l] &cGame ended due to not enough players"));
-                    Main.access$0(true);
-                    Main.endGameCount();
-                    Main.time = 0;
-                    Main.GameStarted = false;
+                    access$0(true);
+                    endGameCount();
+                    time = 0;
+                    GameStarted = false;
                     return;
                 }
-                if (Main.GameStarted.booleanValue() || gamestartingwithtimer) return;
-                Main.StartGame();
-                Main.access$2(true);
+                if (Main.GameStarted.booleanValue() || gamestartingwithtimer) {
+                	return;
+                }
+                StartGame();
+                access$2(true);
             }
         }, 20, 20);
     }
@@ -307,7 +330,7 @@ implements Listener {
 
     public static void endGameCount() {
         time = 0;
-        if (!GameStarted.booleanValue()) {
+        if (!GameStarted) {
             return;
         }
         GameStarted = false;
@@ -330,10 +353,10 @@ implements Listener {
         new BukkitRunnable(){
 
             public void run() {
-                if (Main.GameStarted.booleanValue()) {
+                if (GameStarted) {
                     return;
                 }
-                Main.endGame();
+                endGame();
             }
         }.runTaskLater(plugin, 200);
     }
@@ -375,9 +398,12 @@ implements Listener {
         }
         Bukkit.getServer().createWorld(new WorldCreator(tounload));
         Bukkit.getServer().getWorld(tounload).setAutoSave(false);
+        for(com.cubedcraft.warzone.teams.Team team : teams.values()) {
+        	team.getPlayers().clear();
+        }
         GameStarted = false;
         gamestartingwithtimer = false;
-        Main.ResetScore();
+        ResetScore();
     }
 
     public static int getRedTeamScore() {
@@ -495,8 +521,8 @@ implements Listener {
     }
 
     public static void updateBlueScore() {
-        Main.setBlueTeamScore(Main.getBlueTeamScore() - 10);
-        if (Main.getBlueTeamScore() <= 0) {
+        setBlueTeamScore(Main.getBlueTeamScore() - 10);
+        if (getBlueTeamScore() <= 0) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 WarZonePlayer wz = Main.getWarZonePlayer(p.getUniqueId());
                 int xp = Config.ExpPerWool();
@@ -518,17 +544,17 @@ implements Listener {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerWin")
                     		.replace("%player%", p.getName()));
                 }
-                Main.CreateScoreBoard(p);
+                CreateScoreBoard(p);
             }
             GameEndedDuetoWoolDestroyed = true;
-            Main.endGameCount();
+            endGameCount();
             return;
         }
     }
 
     public static void UpdateRedScore() {
-        Main.setRedTeamScore(Main.getRedTeamScore() - 10);
-        if (Main.getRedTeamScore() <= 0) {
+        setRedTeamScore(Main.getRedTeamScore() - 10);
+        if (getRedTeamScore() <= 0) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 WarZonePlayer wz = Main.getWarZonePlayer(p.getUniqueId());
                 int xp = Config.ExpPerWool();
@@ -550,10 +576,10 @@ implements Listener {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerWin")
                     		.replace("%player%", p.getName()));
                 }
-                Main.CreateScoreBoard(p);
+                CreateScoreBoard(p);
             }
             GameEndedDuetoWoolDestroyed = true;
-            Main.endGameCount();
+            endGameCount();
             return;
         }
     }
@@ -598,6 +624,4 @@ implements Listener {
         log.info("DEBUG: " + currentWorldName);
         log.info("DEBUG: " + Main.NextWorld);
 	}
-
 }
-

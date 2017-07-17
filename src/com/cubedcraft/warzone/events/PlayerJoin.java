@@ -1,4 +1,4 @@
-package com.cubedcraft.warzone.Events;
+package com.cubedcraft.warzone.events;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;

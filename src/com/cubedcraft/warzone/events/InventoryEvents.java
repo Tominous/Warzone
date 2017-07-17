@@ -1,4 +1,4 @@
-package com.cubedcraft.warzone.Events;
+package com.cubedcraft.warzone.events;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +22,10 @@ import org.bukkit.util.Vector;
 import com.cubedcraft.warzone.Config;
 import com.cubedcraft.warzone.Main;
 import com.cubedcraft.warzone.WarZonePlayer;
+import com.cubedcraft.warzone.teams.Team.ETeam;
 
-public class InventoryEvents
-implements Listener {
-    Boolean tea = true;
+public class InventoryEvents implements Listener {
+	
     List<UUID> TntCooldowns = new ArrayList<UUID>();
 
     @EventHandler
@@ -43,8 +43,7 @@ implements Listener {
                 }
                 if (clicked.getType().equals(Material.BOOK)) {
                 	if (wz.isObserver()) {
-	                    if (this.tea.booleanValue()) {
-	                        this.tea = false;
+	                    if (Main.searchTeam().getTeam().equals(ETeam.BLUE)) {
 	                        wz.setBlue();
 	                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
 	                        player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
@@ -53,7 +52,6 @@ implements Listener {
 	                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
 	                        }
 	                    } else {
-	                        this.tea = true;
 	                        wz.setRed();
 	                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
 	                        player.sendMessage(ChatColor.RED + "You have been added to the red team");
@@ -182,6 +180,4 @@ implements Listener {
             return;
         }
     }
-
 }
-

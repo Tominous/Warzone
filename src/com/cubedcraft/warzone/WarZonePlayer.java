@@ -2,17 +2,18 @@ package com.cubedcraft.warzone;
 
 import org.bukkit.Location;
 
+import com.cubedcraft.warzone.teams.Team.ETeam;
+
 import de.inventivegames.hologram.Hologram;
 
 public class WarZonePlayer {
+	
     private int coins;
     private int kills;
     private int deaths;
     private int wins;
     private int wool;
     private int exp;
-    private boolean isBlue;
-    private boolean isRed;
     private boolean isObserver;
     private String Kits;
     private String uuid;
@@ -20,6 +21,7 @@ public class WarZonePlayer {
     private Hologram Hologram;
     private Location SpawnPoint;
     int CurrentKit;
+    ETeam team;
 
     public WarZonePlayer(String uuid, int coins, int kills, int deaths, int wins, int wool, int exp, String kits, String MinecraftUserName) {
         this.setUuid(uuid);
@@ -30,8 +32,6 @@ public class WarZonePlayer {
         this.exp = exp;
         this.Kits = kits;
         this.isObserver = true;
-        this.isRed = false;
-        this.isBlue = false;
         this.MinecraftName = MinecraftUserName;
         this.CurrentKit = Config.getDefaultKit();
         this.wool = wool;
@@ -102,22 +102,22 @@ public class WarZonePlayer {
     }
 
     public boolean isBlue() {
-        return this.isBlue;
+        return team != null && team.equals(ETeam.BLUE);
     }
 
     public void setBlue() {
-        this.isBlue = true;
-        this.isRed = false;
+        this.team = ETeam.BLUE;
+        Main.teams.get(team).getPlayers().add(this);
         this.isObserver = false;
     }
 
     public boolean isRed() {
-        return this.isRed;
+        return team != null && team.equals(ETeam.RED);
     }
 
     public void setRed() {
-        this.isRed = true;
-        this.isBlue = false;
+        this.team = ETeam.RED;
+        Main.teams.get(team).getPlayers().add(this);
         this.isObserver = false;
     }
 
@@ -127,8 +127,7 @@ public class WarZonePlayer {
 
     public void setObserver() {
         this.isObserver = true;
-        this.isBlue = false;
-        this.isRed = false;
+        this.team = null;
     }
 
     public String getKits() {

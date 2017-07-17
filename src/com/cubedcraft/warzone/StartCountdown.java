@@ -7,15 +7,15 @@ public class StartCountdown {
 
     private int countdownTimer;
  
-    public void start(final int time, final String msg) {
+    public void start(int time, String msg) {
         this.countdownTimer = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
             int i = time;
  
             public void run() {
                 Bukkit.broadcastMessage(ChatColor.GREEN + "Game " + msg + " in " + i + " seconds");
-                this.i--;
-                if (this.i <= 0) {
-                    StartCountdown.this.cancel();
+                i--;
+                if (i <= 0) {
+                    cancel();
                 }
             }
         }
@@ -23,6 +23,6 @@ public class StartCountdown {
     }
  
     public void cancel() {
-        Bukkit.getScheduler().cancelTask(this.countdownTimer);
+        Bukkit.getScheduler().cancelTask(countdownTimer);
     }
 }
