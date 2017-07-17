@@ -15,3 +15,5 @@ commands:
   warzone:
     description: Main command for the warzone plugin
     usage: Type /warzone {coins/exp} {add/remove/set} {player} {amount}
+  next:
+  wardebug:
