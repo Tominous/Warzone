@@ -47,7 +47,7 @@ public class InventoryEvents implements Listener {
 	                        wz.setBlue();
 	                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
 	                        player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
-	                        if (Main.GameStarted.booleanValue()) {
+	                        if (Main.GameStarted) {
 	                            Main.startPlayerGame(player);
 	                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
 	                        }
@@ -55,7 +55,7 @@ public class InventoryEvents implements Listener {
 	                        wz.setRed();
 	                        player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
 	                        player.sendMessage(ChatColor.RED + "You have been added to the red team");
-	                        if (Main.GameStarted.booleanValue()) {
+	                        if (Main.GameStarted) {
 	                            Main.startPlayerGame(player);
 	                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &4RED&f team"));
 	                        }
@@ -73,7 +73,7 @@ public class InventoryEvents implements Listener {
                         wz.setBlue();
                         player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.BLUE + player.getName());
                         player.sendMessage(ChatColor.BLUE + "You have been added to the blue team");
-                        if (Main.GameStarted.booleanValue()) {
+                        if (Main.GameStarted) {
                             Main.startPlayerGame(player);
                             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &9BLUE&f team"));
                         }
@@ -89,7 +89,7 @@ public class InventoryEvents implements Listener {
                         wz.setRed();
                         player.setPlayerListName(String.valueOf(Config.getPrefix(player)) + " " + ChatColor.RED + player.getName());
                         player.sendMessage(ChatColor.RED + "You have been added to the red team");
-                        if (Main.GameStarted.booleanValue()) {
+                        if (Main.GameStarted) {
                             Main.startPlayerGame(player);
                             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', player.getName() + " joined &4RED&f team"));
                         }
@@ -98,7 +98,7 @@ public class InventoryEvents implements Listener {
                     }
                     ev.setCancelled(true);
                 }
-                if (Main.GameStarted.booleanValue()) {
+                if (Main.GameStarted) {
                     Main.startPlayerGame(player);
                 }
             }
@@ -160,7 +160,7 @@ public class InventoryEvents implements Listener {
                     ev.setCancelled(true);
                     return;
                 }
-                TNTPrimed tnt = (TNTPrimed)p.getLocation().getWorld().spawn(p.getLocation(), TNTPrimed.class);
+                TNTPrimed tnt = (TNTPrimed) p.getLocation().getWorld().spawn(p.getLocation(), TNTPrimed.class);
                 Vector direction = ev.getPlayer().getLocation().getDirection().multiply(1.2);
                 tnt.setFuseTicks(100);
                 direction.setY(direction.getY() + 0.5);

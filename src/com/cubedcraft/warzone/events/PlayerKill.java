@@ -1,5 +1,7 @@
 package com.cubedcraft.warzone.events;
 
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +21,11 @@ public class PlayerKill implements Listener {
     @EventHandler(priority=EventPriority.HIGH)
     public void onFallDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            event.setCancelled(true);
+            WarZonePlayer wz = Main.getWarZonePlayer(event.getEntity().getUniqueId());
+            
+            if(wz.lastDeathTime + TimeUnit.SECONDS.toMillis(2) > System.currentTimeMillis()) {
+            	event.setCancelled(true);
+            }
         }
     }
     
@@ -31,12 +37,14 @@ public class PlayerKill implements Listener {
         p.setFireTicks(0);
         p.setFoodLevel(20);
         WarZonePlayer wz = Main.getWarZonePlayer(p.getUniqueId());
-        if (wz.isObserver() || !Main.GameStarted.booleanValue()) {
+        wz.lastDeathTime = System.currentTimeMillis();
+        if (wz.isObserver() || !Main.GameStarted) {
             new BukkitRunnable(){
 
                 public void run() {
                     Main.giveStartItems(p);
                 }
+                
             }.runTaskLater(Main.getPlugin(), 5);
             p.teleport(Config.getObserverSpawn());
             return;
@@ -49,6 +57,7 @@ public class PlayerKill implements Listener {
             public void run() {
                 Main.startPlayerGame(p);
             }
+            
         }.runTaskLater(Main.getPlugin(), 5);
         if (p.getKiller() instanceof Player) {
             WarZonePlayer wzp = Main.getWarZonePlayer(p.getKiller().getUniqueId());
@@ -61,9 +70,7 @@ public class PlayerKill implements Listener {
             wzp.setExp(wzp.getExp() + xp);
             wzp.setCoins(wzp.getCoins() + coins);
             wzp.setKills(wzp.getKills() + 1);
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerKilled")
-            		.replace("%killer%", p.getKiller().getName())
-            		.replace("%player%", p.getName()));
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Main.getPlugin().getConfig().getString("commands.playerKilled").replace("%killer%", p.getKiller().getName()).replace("%player%", p.getName()));
             Main.CreateScoreBoard(p.getKiller());
         }
     }

@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Logger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
@@ -19,7 +17,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -32,14 +29,12 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
-
 import com.cubedcraft.warzone.events.BlockEvents;
 import com.cubedcraft.warzone.events.InventoryEvents;
 import com.cubedcraft.warzone.events.PlayerJoin;
 import com.cubedcraft.warzone.events.PlayerKill;
 import com.cubedcraft.warzone.teams.Team.ETeam;
 import com.google.common.collect.Maps;
-
 import io.puharesource.mc.titlemanager.api.v2.TitleManagerAPI;
 
 public class Main extends JavaPlugin implements Listener {
@@ -76,13 +71,13 @@ public class Main extends JavaPlugin implements Listener {
     
     public static com.cubedcraft.warzone.teams.Team searchTeam() {
     	com.cubedcraft.warzone.teams.Team team = null;
-    	for(Entry<ETeam, com.cubedcraft.warzone.teams.Team> entry : teams.entrySet()) {
+    	for(com.cubedcraft.warzone.teams.Team t : teams.values()) {
     		if(team == null) {
-    			team = entry.getValue();
+    			team = t;
     			continue;
     		}
-    		if(entry.getValue().size() < team.size()) {
-    			team = entry.getValue();
+    		if(t.size() < team.size()) {
+    			team = t;
     		}
     	}
     	return team;
@@ -102,7 +97,7 @@ public class Main extends JavaPlugin implements Listener {
         cd = new StartCountdown();
         ActiveWorld = "WarzoneWorld";
         if (Config.getWorldName() == null) {
-            this.saveDefaultConfig();
+            saveDefaultConfig();
         }
         worlds = Config.getWorlds();
         Bukkit.getServer().unloadWorld("WarzoneWorld", false);
@@ -120,7 +115,9 @@ public class Main extends JavaPlugin implements Listener {
         this.loadWorlds();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(Bukkit.getWorld(ActiveWorld).getSpawnLocation());
-        if (WarZonePlayers.containsKey(p.getUniqueId())) continue;
+            if (WarZonePlayers.containsKey(p.getUniqueId())) {
+            	continue;
+            }
             Main.addWarZonePlayer(p.getUniqueId(), Mysql.getWarZonePlayer(p.getUniqueId()));
         }
         this.runTimer();
@@ -458,6 +455,10 @@ public class Main extends JavaPlugin implements Listener {
 
     public static void removeWarZonePlayer(UUID uuid) {
         if (WarZonePlayers.containsKey(uuid)) {
+        	WarZonePlayer wzp = WarZonePlayers.get(uuid);
+        	if(wzp.team != null) {
+        		teams.get(wzp.team).getPlayers().remove(wzp);
+        	}
             WarZonePlayers.remove(uuid);
         }
     }
@@ -585,7 +586,7 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public static void TeamSelect(Player p) {
-        Inventory TeamSelectInv = Bukkit.createInventory((InventoryHolder)null, (int)9, (String)(ChatColor.RED + "Team Selection"));
+        Inventory TeamSelectInv = Bukkit.createInventory(null, 9, ChatColor.RED + "Team Selection");
         ItemStack AutoSelect = new ItemStack(Material.BOOK);
         ItemMeta AutoSelectim = AutoSelect.getItemMeta();
         AutoSelectim.setDisplayName(ChatColor.GREEN + "Auto Select");
@@ -600,9 +601,10 @@ public class Main extends JavaPlugin implements Listener {
         ItemMeta redim = TeamRed.getItemMeta();
         redim.setDisplayName(ChatColor.RED + "Red Team");
         TeamRed.setItemMeta(redim);
-        TeamSelectInv.addItem(new ItemStack[]{AutoSelect});
-        TeamSelectInv.addItem(new ItemStack[]{TeamBlue});
-        TeamSelectInv.addItem(new ItemStack[]{TeamRed});
+        
+        TeamSelectInv.addItem(AutoSelect);
+        TeamSelectInv.addItem(TeamBlue);
+        TeamSelectInv.addItem(TeamRed);
         p.openInventory(TeamSelectInv);
     }
 

@@ -22,6 +22,7 @@ public class WarZonePlayer {
     private Location SpawnPoint;
     int CurrentKit;
     ETeam team;
+    public Long lastDeathTime = 0L;
 
     public WarZonePlayer(String uuid, int coins, int kills, int deaths, int wins, int wool, int exp, String kits, String MinecraftUserName) {
         this.setUuid(uuid);

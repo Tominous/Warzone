@@ -20,7 +20,7 @@ implements Listener {
     public void PlayerJoinEv(PlayerJoinEvent ev) {
         WarZonePlayer Warplayer = Mysql.getWarZonePlayer(ev.getPlayer().getUniqueId());
         Warplayer.setObserver();
-        final Player p = ev.getPlayer();
+        Player p = ev.getPlayer();
         p.setTotalExperience(0);
         p.setLevel(0);
         p.setExp(0.0f);
@@ -34,12 +34,14 @@ implements Listener {
         p.setGameMode(GameMode.SURVIVAL);
         p.setPlayerListName(String.valueOf(Config.getPrefix(p)) + " " + ChatColor.AQUA + p.getName());
         Main.Fixinvis();
+        
         new BukkitRunnable(){
 
             public void run() {
                 p.teleport(Config.getObserverSpawn());
                 Main.TeamSelect(p);
             }
+            
         }.runTaskLater(Main.getPlugin(), 5);
     }
 
@@ -48,6 +50,4 @@ implements Listener {
         Mysql.UpdateWarZonePlayer(ev.getPlayer().getUniqueId());
         Main.removeWarZonePlayer(ev.getPlayer().getUniqueId());
     }
-
 }
-
